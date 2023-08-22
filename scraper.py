@@ -1,3 +1,4 @@
+import argparse
 import os
 import requests
 from datetime import date
@@ -29,7 +30,7 @@ def scrape_and_save_article(article_url, save_path):
 
 
 # Main scraping function
-def main():
+def scrape(download_path):
     menu_url = base_url
     menu_page = get_parsed_page(menu_url)
 
@@ -47,14 +48,19 @@ def main():
                 articles = genre_page.find_all("article")
                 for article in articles:
                     article_url = base_url + article.find("a")["href"]
-                    save_folder = os.path.join(genre, date.today().strftime("%Y_%m_%d"))
+                    save_folder = os.path.join(download_path, genre, date.today().strftime("%Y_%m_%d"))
                     os.makedirs(save_folder, exist_ok=True)
                     scrape_and_save_article(article_url, save_folder)
                     print(f"Saved article from {article_url} to {save_folder}")
 
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--download_directory", help='Path to save scraped data in.')
+    args = parser.parse_args()
+
+    scrape(args.download_directory)
+
+
 if __name__ == "__main__":
     main()
-
-
-
